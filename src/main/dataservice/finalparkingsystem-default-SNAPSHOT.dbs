@@ -2,14 +2,65 @@
    <config id="default">
         <property name="jndi_resource_name">jdbc/TestDS</property>
    </config>
-   <query id="SQL1" useConfig="default">
-      <sql>select id,data from Persons</sql>
-      <result element="Entries" rowName="Entry">
-         <element column="id" name="id" xsdType="string"/>
-         <element column="data" name="data" xsdType="string"/>
+
+ <query id="getLatest" useConfig="parking">
+      <sql>select parkId, specDate, status, max(specTime) as specTime,operator from FinalSystem group by parkId order by specDate desc, specTime desc;</sql>
+      <result element="BaseElement" rowName="Element">
+         <element column="parkId" name="parkId" xsdType="string"/>
+         <element column="specTime" name="specTime" xsdType="time"/>
+         <element column="specTime" name="specDate" xsdType="date"/>
+         <element column="status" name="status" xsdType="string"/>
+         <element column="operator" name="operator" xsdType="string"/>
       </result>
- </query>
-   <operation name="OP1">
-      <call-query href="SQL1"/>
+   </query>
+   <query id="getLast" useConfig="parking">
+      <sql>SELECT * FROM parkingRecords WHERE specTime IN (SELECT MAX(specTime) FROM FinalSystem  GROUP BY parkId) order by parkId limit 3;</sql>
+      <result element="BaseElement" rowName="Element">
+         <element column="parkId" name="parkId" xsdType="string"/>
+         <element column="specTime" name="specTime" xsdType="time"/>
+         <element column="specDate" name="specDate" xsdType="date"/>
+         <element column="status" name="status" xsdType="string"/>
+         <element column="operator" name="operator" xsdType="string"/>
+      </result>
+   </query>
+   <query id="addData" useConfig="parking">
+      <sql>INSERT INTO FinalSystem(parkId,specTime,specDate,status,operator) VALUES (:parkId,:specTime,:specDate,:status,:operator)</sql>
+      <param name="parkId" sqlType="STRING"/>
+      <param name="specTime" sqlType="TIME"/>
+      <param name="specDate" sqlType="DATE"/>
+      <param name="status" sqlType="STRING"/>
+      <param name="operator" sqlType="STRING"/>
+   </query>
+   <query id="insertRecord" useConfig="parking">
+      <sql>INSERT INTO FinalSystem(parkId,specTime,specDate,status,operator) VALUES (:parkId,now(),now(),:status,:operator)</sql>
+      <param name="parkId" sqlType="STRING"/>
+      <param name="status" sqlType="STRING"/>
+      <param name="operator" sqlType="STRING"/>
+   </query>
+   <operation name="addData">
+      <call-query href="addData">
+         <with-param name="parkId" query-param="parkId"/>
+         <with-param name="specTime" query-param="specTime"/>
+         <with-param name="specDate" query-param="specDate"/>
+         <with-param name="status" query-param="status"/>
+         <with-param name="operator" query-param="operator"/>
+      </call-query>
    </operation>
+   <operation name="insertRecord">
+      <call-query href="insertRecord">
+         <with-param name="parkId" query-param="parkId"/>
+         <with-param name="status" query-param="status"/>
+         <with-param name="operator" query-param="operator"/>
+      </call-query>
+   </operation>
+   <resource method="GET" path="latestRecord">
+      <call-query href="getLatest"/>
+   </resource>
+   <resource method="GET" path="lastRecord">
+      <call-query href="getLast"/>
+   </resource>
+
+
+
+
 </data>
