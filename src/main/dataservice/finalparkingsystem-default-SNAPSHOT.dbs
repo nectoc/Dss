@@ -59,5 +59,8 @@
    <resource method="GET" path="lastRecord">
       <call-query href="getLast"/>
    </resource>
+   <resource method="POST" path="addRecord">
+   <call-query href="insertRecord"/>
+   </resource>
 
 </data>
