@@ -3,7 +3,7 @@
         <property name="jndi_resource_name">jdbc/TestDS</property>
    </config>
 
- <query id="getLatest" useConfig="parking">
+ <query id="getLatest" useConfig="default">
       <sql>select parkId, specDate, status, max(specTime) as specTime,operator from FinalSystem group by parkId order by specDate desc, specTime desc;</sql>
       <result element="BaseElement" rowName="Element">
          <element column="parkId" name="parkId" xsdType="string"/>
@@ -13,7 +13,7 @@
          <element column="operator" name="operator" xsdType="string"/>
       </result>
    </query>
-   <query id="getLast" useConfig="parking">
+   <query id="getLast" useConfig="default">
       <sql>SELECT * FROM parkingRecords WHERE specTime IN (SELECT MAX(specTime) FROM FinalSystem  GROUP BY parkId) order by parkId limit 3;</sql>
       <result element="BaseElement" rowName="Element">
          <element column="parkId" name="parkId" xsdType="string"/>
@@ -23,7 +23,7 @@
          <element column="operator" name="operator" xsdType="string"/>
       </result>
    </query>
-   <query id="addData" useConfig="parking">
+   <query id="addData" useConfig="default">
       <sql>INSERT INTO FinalSystem(parkId,specTime,specDate,status,operator) VALUES (:parkId,:specTime,:specDate,:status,:operator)</sql>
       <param name="parkId" sqlType="STRING"/>
       <param name="specTime" sqlType="TIME"/>
@@ -31,7 +31,7 @@
       <param name="status" sqlType="STRING"/>
       <param name="operator" sqlType="STRING"/>
    </query>
-   <query id="insertRecord" useConfig="parking">
+   <query id="insertRecord" useConfig="default">
       <sql>INSERT INTO FinalSystem(parkId,specTime,specDate,status,operator) VALUES (:parkId,now(),now(),:status,:operator)</sql>
       <param name="parkId" sqlType="STRING"/>
       <param name="status" sqlType="STRING"/>
@@ -59,8 +59,5 @@
    <resource method="GET" path="lastRecord">
       <call-query href="getLast"/>
    </resource>
-
-
-
 
 </data>
