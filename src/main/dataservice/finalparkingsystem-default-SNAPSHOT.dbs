@@ -14,7 +14,7 @@
       </result>
    </query>
    <query id="getLast" useConfig="default">
-      <sql>SELECT * FROM parkingRecords WHERE specTime IN (SELECT MAX(specTime) FROM FinalSystem  GROUP BY parkId) order by parkId limit 3;</sql>
+      <sql>SELECT * FROM FinalSystem WHERE specTime IN (SELECT MAX(specTime) FROM FinalSystem  GROUP BY parkId) order by parkId limit 3;</sql>
       <result element="BaseElement" rowName="Element">
          <element column="parkId" name="parkId" xsdType="string"/>
          <element column="specTime" name="specTime" xsdType="time"/>
